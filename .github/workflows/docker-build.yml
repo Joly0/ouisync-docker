@@ -22,7 +22,7 @@ jobs:
           exit 0
         else
           echo "Current hash: $(git rev-parse HEAD)"
-          echo "Current hash: $(cat ../last_commit)"
+          echo "Previous hash: $(cat ../last_commit)"
           git rev-parse HEAD > ../last_commit
         fi
 
