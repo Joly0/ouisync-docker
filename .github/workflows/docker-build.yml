@@ -51,7 +51,7 @@ jobs:
     - name: Generate Cargo.lock file
       run: |
         cd ouisync
-        cargo build
+        cargo build --package ouisync-cli --release --bins
 
     - name: Commit Cargo.lock
       run: |
