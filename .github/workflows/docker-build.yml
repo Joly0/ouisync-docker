@@ -30,12 +30,14 @@ jobs:
           latest_commit=$(git rev-parse HEAD)
           echo "LATEST_COMMIT=${latest_commit}" >> $GITHUB_ENV
         fi
-        
+
     - name: Save the commit hash to a file
+      if: env.LATEST_COMMIT != ''
       run: |
         echo "$LATEST_COMMIT" > last_commit
 
     - name: Commit and push changes
+      if: env.LATEST_COMMIT != ''
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -46,9 +48,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Docker Buildx
+      if: env.LATEST_COMMIT != ''
       uses: docker/setup-buildx-action@v3
 
     - name: Log in to GitHub Container Registry
+      if: env.LATEST_COMMIT != ''
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
@@ -56,6 +60,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push Docker image
+      if: env.LATEST_COMMIT != ''
       run: |
         cd ouisync
         LOWERCASE_REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
@@ -66,5 +71,6 @@ jobs:
         docker push ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest
 
     - name: Clean up
+      if: env.LATEST_COMMIT != ''
       run: |
         rm -rf ouisync
