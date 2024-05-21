@@ -27,16 +27,20 @@ jobs:
         else
           echo "Current hash: $(git rev-parse HEAD)"
           echo "Previous hash: $(cat ../last_commit)"
-          echo $(git rev-parse HEAD) > ../last_commit
+          latest_commit=$(git rev-parse HEAD)
+          echo "LATEST_COMMIT=${latest_commit}" >> $GITHUB_ENV
         fi
         
-    - name: Commit changes
+    - name: Save the commit hash to a file
       run: |
-        cd ..
+        echo "$LATEST_COMMIT" > last_commit
+
+    - name: Commit and push changes
+      run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add last_commit
-        git commit -m "Update last_commit with latest commit hash"
+        git commit -m "Save latest commit hash"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
