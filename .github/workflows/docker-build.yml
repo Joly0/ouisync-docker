@@ -21,6 +21,8 @@ jobs:
           echo "No new commits, exiting..."
           exit 0
         else
+          echo "Current hash: $(git rev-parse HEAD)"
+          echo "Current hash: $(cat ../last_commit)"
           git rev-parse HEAD > ../last_commit
         fi
 
@@ -36,9 +38,9 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        cd ouisync/docker
+        cd ouisync
         LOWERCASE_REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-        docker build -t ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest .
+        docker build -t ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest . -f docker/Dockerfile
         docker push ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest
 
     - name: Clean up
