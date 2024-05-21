@@ -40,41 +40,6 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Cache Cargo registry
-      uses: actions/cache@v2
-      with:
-        path: /usr/local/cargo/registry
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-cargo-registry-
-
-    - name: Cache Cargo index
-      uses: actions/cache@v2
-      with:
-        path: /usr/local/cargo/git/index
-        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-cargo-index-
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y pkg-config libfuse3-dev
-
-    - name: Generate Cargo.lock file
-      run: |
-        cd ouisync
-        cargo build --package ouisync-cli --release --bins
-
-    - name: Commit Cargo.lock
-      run: |
-        cd ouisync
-        git config --global user.email "actions@github.com"
-        git config --global user.name "GitHub Actions"
-        git add Cargo.lock
-        git commit -m "chore: Update Cargo.lock" || echo "No changes to commit"
-        git push || echo "No changes to push"
-
     - name: Build and push Docker image
       run: |
         cd ouisync
