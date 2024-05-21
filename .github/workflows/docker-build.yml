@@ -17,7 +17,11 @@ jobs:
       run: |
         git clone https://github.com/equalitie/ouisync.git
         cd ouisync
-        if [ "$(git rev-parse HEAD)" == "$(cat ../last_commit)" ]; then
+        if [ ! -f ../last_commit ]; then
+          echo "Creating last_commit file..."
+          git rev-parse HEAD > ../last_commit
+          exit 0
+        elif [ "$(git rev-parse HEAD)" == "$(cat ../last_commit)" ]; then
           echo "No new commits, exiting..."
           exit 0
         else
@@ -36,11 +40,22 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v2
+      with:
+        path: /usr/local/cargo/registry/index
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - name: Build and push Docker image
       run: |
         cd ouisync
         LOWERCASE_REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+
+        # Build Docker image
         docker build -t ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest . -f docker/Dockerfile
+
         docker push ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest
 
     - name: Clean up
