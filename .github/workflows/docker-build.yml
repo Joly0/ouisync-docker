@@ -37,8 +37,9 @@ jobs:
     - name: Build and push Docker image
       run: |
         cd ouisync/docker
-        docker build -t ghcr.io/${{ github.repository_owner }}/ouisync:latest .
-        docker push ghcr.io/${{ github.repository_owner }}/ouisync:latest
+        LOWERCASE_REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+        docker build -t ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest .
+        docker push ghcr.io/$LOWERCASE_REPO_OWNER/ouisync:latest
 
     - name: Clean up
       run: |
