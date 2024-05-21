@@ -48,6 +48,19 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cargo-
 
+    - name: Generate Cargo.lock file
+      run: |
+        cd ouisync
+        cargo build --locked --offline
+
+    - name: Commit Cargo.lock
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add Cargo.lock
+        git commit -m "chore: Update Cargo.lock"
+        git push
+
     - name: Build and push Docker image
       run: |
         cd ouisync
